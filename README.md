@@ -5,6 +5,12 @@
 * Apply changes to all instances of a prefab:
   * Inspector -> Overrides -> Apply All
 
+* Right-click on any property in a Component of an instantiatied object
+  to choose to revert to its prefab value
+
+* Any game object properties in bold have different values than the properties
+  in the prefab it came from
+
 ## Physics
 
 ### General
@@ -193,6 +199,33 @@
 
 ## NavMesh
 
+* Create a NavMesh agent:
+  * Add Component NavMeshAgent to object
+
+* Move an agent in a NavMesh:
+
+      // targetTransform would come from Inspector (e.g., set to the player)
+      GetComponent<NavMeshAgent>().SetDestination(targetTransform.position)
+
+  * By default, agent stops at target position, but in Inspector can set
+    the "Stopping Distance" to stop the agent that amount away from the target
+
+* Make agent react only if player is within range:
+
+      enemyPosition = enemyTransform.position;
+      playerPosition = targetTransform.position;
+      distanceToTarget = Vector3.Distance(playerPosition, enemyPosition);
+      if (distanceToTarget <= chaseRange)
+          navMeshAgent.SetDestination(playerPosition);
+
+* Make agent chase or attack depending on how close it is
+  (StoppingDistance is set in Inspector for NavMeshAgent):
+
+      if (distanceToTarget >= navMeshAgent.stoppingDistance)
+          ChaseTarget();
+      else
+          AttackTarget();
+
 * Add a NavMeshObstacle component to an object to avoid an agent
   from running into it. The object may be animated.
   * Green volume appears around object, which defines it as an obstacle
@@ -215,10 +248,83 @@
 
 * Unity recommends choosing the lighting strategy early in development.
 
+* Because blue and orange are kind of complementary, and humans have an orange
+  skin tone, movies often use blue light for contrast.
+
+* Three-point lighting
+  * Used a lot in photography. Look up Wikipedia article for summary.
+  * Key light: main source of illumination, creates shadows
+  * Fill light: fill in shadows with lower intensity,
+    opposite side of key light
+  * Back (or rim) light: top light to help lift subject out of background
+
+* Use Light Explorer to see all lights at once and change common properties
+  * Window -> Rendering -> Light Explorer
+
 * Guidance on creating good looking scenes:
   [https://docs.unity3d.com/Manual/BestPracticeMakingBelievableVisuals.htm](https://docs.unity3d.com/Manual/BestPracticeMakingBelievableVisuals.htm)
 
-### Settings
+### Scene Settings
+
+* Realtime Global Illumination
+  * Turns on indirect lighting in real-time
+    * Not truly "realtime" as Generate Lighting click is still required
+  * Intensity Multiplier (on light) affects how much indirect lighting to show
+  * Uses Enlighten (a 3rd party engine), which is being discontinued
+  * Use for non-moving geometry (must be marked as Static)
+  * Shadow quality is low, can instead use Emissive Light
+  * Use an appropriate Indirect Resolution (under Lightmapping Settings)
+    * Large terrain: 0.1-0.5 texels per unit
+    * Outdoors: 0.5-1 texels per unit
+    * Indoors: 2-3 texels per unit
+  * Can work with various light types (point light, directional, etc.)
+  * Make sure to enable Contribue Global Illumination on objects
+
+* Baked Global Illumination
+  * Another way of processing global illumination (indirect lighting)
+    * Typically, better shadow quality
+  * Lights must be in Baked mode
+  * Directional Mode can be set to Non-Directional if scene has no Normal maps
+    (saves diskspace)
+  * Higher Lightmap Resolution will create more lightmaps and consume
+    more diskspace
+  * Baked Shadow Angle: blurs Soft Shadows
+    * Located Shadow Type for the Directional Light object
+    * Similar setting for Point and Spot light
+  * Cannot do specular highlights
+
+* Mixed lighting
+  * Instead of having two lights (one for baked and another for realtime),
+    you can have one (Mixed light) that does both
+  * Subtractive mode is good for mobile devices because everything is baked
+    * Non-static objects don't cast shadows on Static objects,
+      except for the main Directional Light which can cast realtime shadows
+  * Shadowmask: low quality shadows througout
+  * Distance Shadowmask: high quality shadows for nearby objects,
+    lower quality shadows for far away objects (can modulate this using
+    "Shadow Distance" in Quality settings)
+  * How light mode (Submode) and type of object (Static or not)
+    interact to form direct and indirect lighting:
+
+| Lighting Mode          | Dynamic Receiver                     | Static Receiver                     |
+| ---------------------- | ------------------------------------ | ----------------------------------- |
+|                        | Direct Lighting  | Indirect Lighting | Direct Lighting | Indirect Lighting |
+| ---------------------- | ---------------- | ----------------- | --------------- | ----------------- |
+| Realtime               | Realtime         | None              | Realtime        | None              |
+| Realtime GI            | Realtime         |                   | Realtime        | Realtime Lightmap |
+| Baked                  |                  |                   | Lightmap        | Lightmap          |
+| Mixed - Baked Indirect | Realtime         |                   | Realtime        | Lightmap          |
+| Mixed - Shadowmask     | Realtime         |                   | Realtime        | Lightmap          |
+| Mixed - Subtractive    | Realtime         |                   | Lightmap        | Lightmap          |
+
+* Progressive lightmapper
+  * Can see progress of lightmapping, allowing you to cancel if necessary
+  * Setting recommendations:
+    * Outdoor scenes w/ directional lights
+      * Direct samples: < 100
+    * Indoor scenes:
+      * Direct samples: > 100
+  * Lightmap padding: increase if lightmap "bleeding" is noticeable
 
 * Recommending lighting settings (Window -> Lighting Settings):
   * Check Baked Global Illumination (uncheck to always have real-time lighting)
@@ -228,17 +334,49 @@
     with baked indirect lighting)
   * Do not have Auto Generate on, but run it periodically
 
-* Add environmental lighting (overall lighting):
-  * Open Window -> Rendering -> Lighting Settings
-  * Set Environmental Lighting to Color, then set the ambient color
-
 * When using Baked lighting, it only applies to Static objects,
   so any objects that are not dynamic (won't move), set them to Static.
+  * If there is a seam on a mesh after baking light,
+    enable "Stitch Seams" under the Mesh Renderer -> Lightmapping properties.
 
-* To make baking faster while working, decrease Indirect resolution
-  (e.g., 0.25) and lightmap resolution (e.g., 25).
+* To make baking faster while working:
+  * Decrease Indirect resolution (e.g., 0.25)
+    and lightmap resolution (e.g., 25).
+  * And/or, disable anything not currently being worked on.
+    Organize Hiearchy in such a way that it's easy to re-enable them back
+    (e.g., use dummy "spacer" GameObjects).
 
 * If a Light won't move, but some objects may, set the Light -> Mode to Mixed.
+
+* Ambient occlusion in Lightmapping Settings:
+  * Turn it on to add extra depth to objects
+  * Max Distance extends how far the occlusion shadow goes out
+  * Indirect Contribution makes the shadows darker
+  * When there's direct light, like a Directional Light,
+    the ambient occlusion may be less visible,
+    but you can increase the "Direct Contribution" setting to add some back
+
+### Environment Settings
+
+* To add ambient color (overall lighting to the whole scene),
+  use environmental lighting:
+  * Open Window -> Rendering -> Lighting Settings
+  * Set Environmental Lighting Source:
+    * Skybox
+    * Color: overall ambient color
+    * Gradient source gives colors for the sky, equator, and ground
+      * Typically set to blue, white, and brown
+  * Note: When importing a model, and you'll use baked GI,
+    make sure that the Generate Lightmap UVs is checked
+
+* Environment Reflections
+  * Turn on by setting Intensity Multiplier (under Environment Reflections
+    in Lighting Settings) to 1
+  * Increase material's Metallic and Smoothness properties
+  * For higher reflection resolution, increase Resolution under
+    Environment Reflections in Lighting Settings
+
+### Other Settings
 
 * There is a maximum number of lights that can affect a single object.
   The default is 4 (for URP). To increase:
@@ -247,9 +385,6 @@
     Under the Additional Lights section, increase the Per Object Limit
   * It may work better to split a large wall or floor into multiple objects
     in order to have only a few lights affect them.
-
-* If there is a seam on a mesh after baking light,
-  enable "Stitch Seams" under the Mesh Renderer -> Lightmapping properties.
 
 * The ``RenderSettings`` object has several properties (e.g., fog)
   to customize programmatically.
@@ -265,9 +400,29 @@
   * Cubemap: Image
     * Unity has free cubemaps in AssetStore
 
-* Create custom SkyBox:
+* Create a procedural SkyBox:
   * Create -> Material
-  * Set Shader to Skybox, and choose the type
+  * Set Shader to Skybox/Procedural
+  * Edit sky and ground tint (and other properties) in Skybox material
+  * For consistency, set the Camera "Clear Flags" to Skybox
+  * For lighting consistency, set the Environment Lighting Source
+    (in Lighting settings) to Skybox
+  * Set Environment Sun Source to the directional light
+    * In Skybox material, you can adjust Sun properties
+
+* Image-based lighting/skybox
+  * Get a 360 HDR panoramic image
+    * See Resources (lesson 23 of Udemy Lighting course) to read
+      on how to do it yourself
+    * Many provided free by Unity in Asset Store (search for HDRI)
+    * Set Texture Type to Default, Texture Shape to Cube, and
+      Convolution Type to None
+  * Create a new material and set shader to Skybox/Cubemap
+    * Drag HDR image to Cubmap field
+    * In Lighting settings, drag material to Skybox Material field
+  * May need to increase Environment Samples to 1000 and set Filtering
+    to Auto (or Advanced > OpenImageDenoise in Indirect Denoiser)
+    * See Comments in lesson 23 of Udemy Lighting course
 
 ### Directional Light
 
@@ -280,6 +435,8 @@
   * On some models, the shadow of an object may have holes
   * These can be fixed by playing with the Normal Bias and Bias settings
   * Try lowering the Normal Bias first, then play with Bias
+    * Normal Bias may be down to 0
+    * Bias of 0.05 works well
 
 ### Point Light
 
@@ -296,14 +453,21 @@
   (light coming down and light coming up).
 
 * Cookie: Mask to add an effect on the spotlight (e.g., flashlight lens).
+  * Change all spot light cookies under Lighting -> Other Settings ->
+    Spot Cookie
+  * Black means the light does not go through; white the light goes through
 
 ### Area Light
 
-* Use area lighth for things like office lighting.
+* Use area light for things like office lighting.
 
 * Area light is baked-only (are never real-time).
 
 * Specify Width/Height and play with Intensity to see results.
+
+* Tip: tilt light to create a more organic feel.
+
+* Indirect Multiplier controls how much indirect light is caused by this light.
 
 ### Indirect Lighting
 
@@ -319,7 +483,29 @@
 * Add emissive lighting:
   * The slot to the left of Color is the mask (itself a texture)
     where the emission should be applied
+    * After selecting an emissive color, increase the intensity
+      to emit more light
   * A Color value greater than 1 (HDR) can illuminate other objects
+  * Larger objects emit more light
+
+* Tip: suffix emissive objects w/ "Emissive" and group them.
+
+### Masks
+
+* Problem: you want to illuminate an area with a single light
+  but some objects are static and others are not (so baking won't work
+  for the dynamic objects).
+  * Solution:
+    * Duplicate the baked light and change the new light's mode to Realtime
+    * Create a new Layer (e.g., "Props") and put dynamics objects there
+    * Change the new light's Culling Mask to the new layer
+
+* Problem: direct lighting bleeds through interior environment
+  * Solution:
+    * Put interior environment on its own layer
+    * Change the direct lighting Culling Mask to exclude that layer
+    * In some cases, may need to create dummy objects used only to cast shadows
+      (set their "Cast Shadows" property to "Shadows Only")
 
 ### Light Probes
 
@@ -337,6 +523,16 @@
   * Select some probes, then click on Duplicate
   * Focus on adding probes around objects producing light
 
+* You can turn on/off light probles for an object in the "Light Probes"
+  property (set to Blend Probes or Off).
+
+* There are some debugging visualization settings in Lighting Settings
+  for light probes.
+
+* Tip: Some "static" objects could instead by made non-Static
+  and lit by light probes rather than lightmapping.
+  This could save a lot of diskspace. Best for non-important objects.
+
 ### Reflection Probes
 
 * A reflection probe stores a reflection at that location,
@@ -345,26 +541,77 @@
 * By default, reflective objects (metallic, smooth material)
   only reflect the SkyBox.
 
+* The sphere in the middle of a new reflection probe is a preview
+  of the reflection. The cube around it specifies which game objects
+  are influenced by the probe.
+
 * Create a reflection probe:
   * Create -> Light -> Reflection Probe
   * Resize reflection cube to encompass what to reflect
-  * Reflection probe type may be Baked or Realtime
-    * Baked: works only with Static objects
-    * Realtime: works with all objects (very expensive, so use sparingly)
-      * True realtime: set Refresh mode to Every Frame
-  * Even without fully reflective objects, it's good to have
-    a reflection probe because it affects smooth objects
+
+* Baked reflection: works only with Static objects
+  * Bake either in Inspector of the selected probe,
+    or under Lighting Settings in the Generate Lighting drop down
+
+* Realtime reflection: works with all objects (very expensive, so use sparingly)
+  * True realtime: set Refresh mode to Every Frame
+  * Time slicing helps spread out the work over multiple frames
+    (helps performance)
+  * Tip: To have a perfectly reflective sphere reflect as you move with it
+    (as if holding it), make the reflective probe a child of the sphere
+    (itself a child of the FPS Controller) and set it to realtime
+    without time slicing
+
+* Objects not marked as Reflection Probe Static won't show up
+  on the baked reflection probe
+
+* Probe has settings similar to a camera (clipping plane, culling mask, etc.).
+  * Importance setting is used when there are multiple probes
+  * Blend distance determines the softness of the edge of the reflection
+    probe box
+  * Use Box Projection for indoor spaces, and make the box
+    about the size of what to reflect
+
+* Even without fully reflective objects, it's good to have
+  a reflection probe because it affects smooth objects
 
 ## Post-Processing
 
-* There's a package called Post Processing that can be installed.
+* Add post-processing (version 2):
+  * Add post-processing package (version 2) from Package Manager
+  * Create a Post Processing Profile in Project View
+  * Create an empty game object (named PostProcessingGlobal)
+    * Add the Post-process Volume Component
+      * Check Is Global
+      * Drag the created Profile to the Profile slot
+    * Set Layer to PostProcessing
+  * Select the Camera and add Component Post-process Layer
+    * Set Layer field of Component to PostProcessing
+    * Set anti-aliasing (like FXAA) with Fast Mode (if it looks OK)
+    * Uncheck Deferred Fog if not using
+  * Go back to Profile and add desired effects
+    * Common effects:
+      * Ambient Occlusion: creates shadows around intersecting objects
+      * Bloom: glowing around lights
+      * Antialiasing
+      * Grain
+      * Color Grading
+      * Screen-space reflections
+      * Vignette: dark border around scene
+    * Can edit here, or in PostProcessingGlobal object
 
-* Effects:
-  * Ambient occlusion: creates shadows around intersecting objects
-  * Bloom: glowing around lights
-  * Antialiasing
-  * Grain
-  * Vignette (dark border around scene)
+* Post-processing volumes
+  * Additional effects: lens distortion, chromatic aberration, vignette
+  * To trigger different post-processing volumes:
+    * Create a new GameObject with a PostProcessingVolume Component
+    * Add a Box Collider with IsTrigger set to true
+    * Uncheck IsGlobal
+    * Adjust Blend Distance to transition smoothly
+    * Set Priority to 1 (if it's overlapping with another, like Global,
+      post-processing volume
+    * Drag an appropriate object (e.g., FPS Controller) to the Trigger field
+      in the Post Process Layer Component (in Camera) that will trigger
+      the transition
 
 ## Materials
 
@@ -456,6 +703,9 @@
 
       material.SetFloat("_Exposure", 1.0f);
 
+* You can save material settings, and reload them if needed
+  (settings icon, top right)
+
 ## Shaders
 
 * The default "Lit" shader offers a lot of variety and options,
@@ -542,13 +792,24 @@
 
 ## Audio
 
-* Add sound effects to an object:
-  * Add an Audio Source component to an object (where sound is emitted from?)
-  * Uncheck Play On Awake if the sound is controlled by a script
+* Quick way to have ambient sound:
+  * Drag audio clip to Hierarchy
+  * Check Loop
+
+* Emit a sound from an object:
+  * Add an Audio Source component to the object
   * Drag an audio clip from Assets to AudioClip slot
+  * Uncheck Play On Awake if the sound is controlled by a script
   * Add Audio Listener component to the Main Camera
-  * In code, get the Audio Source component (``GetComponent<AudioSource>()``)
-    and call its ``Play()`` method
+  * To play in code:
+
+        audioSource = GetComponent<AudioSource>();
+        audioSource.Play();
+
+  * To play any audio clip:
+
+        // audioClip could be a private [SerializeField]
+        audioSource.PlayOneShot(audioClip);
 
 * Play sound when objects collide:
   * Add Audio Source to one of the objects, and uncheck Play On Awake
@@ -561,10 +822,43 @@
   * Download Unity-Beat-Detection from GitHub
   * Use the code's ``OnBeat`` event to script when a beat is detected
 
+* Get free sounds from: https://freesound.org/
+
+* To create your own sounds: Audacity (free, open source)
+
 ## Particle System
 
 * Note: The Particle System will be soon replaced
   by the Visual Effects (VFX) Graph.
+
+* Create a new particle system:
+  * Create an Empty Object
+  * Add component ParticleSystem
+  * Or, simply Create Effect -> Particle System
+
+* Play the particle system in code:
+
+      particleSystem.Play();
+
+* Turn on Collision to interact with the scene:
+  * Type World collides with anything in the world
+  * Turn on Send Collision Message
+  * Detect with ``OnParticleCollision()``
+
+* When creating explosions, may want to instantiate a particle system prefab
+  (rather than have it as a child object), so that it survives
+  when the main object is destroyed (because of the explosion):
+
+      // Rotation causes the effect to happen perpendicular to the object hit
+      var impact = Instantiate(hitEffect, hit.point, Quaternion.LookRotation(hit.normal));
+
+  * Put inside an empty parent (e.g., "Spawn at Runtime") to keep
+    the Hierarchy organized
+  * Destroy the explosion particle object when done
+    (e.g., ``Destroy(gameObject, seconds)``)
+
+* Standard Assets contains several ParticleSystem prefabs, including explosion,
+  fire, and smoke.
 
 ## XR
 
@@ -768,6 +1062,8 @@
     button, next to the add keyframe button)
   * Link the event to an existing method of a component attached to the object
     being animated
+  * Useful for performing a sound or causing damage to player
+    at exact enemy attack in animation
 
 * Animator controller
   * When an animation clip is created, an animatior controller
@@ -880,12 +1176,15 @@
 
 ## Timeline
 
+* Timeline is used to choreograph object animations, audio, events.
+
 * Unity Timelines can have one or more tracks of audio, activation,
   animation, and signal. Timelines are a type of Unity Playable.
 
 * Create a Timeline and add an audio file:
-  * Create an empty object and name it "Director"
+  * Create an empty object and name it "Director" (or "Master Timeline")
   * Select Window -> Sequencing -> Timeline
+    * Click on the Lock button to always show the timeline
   * Click on Create and save it (e.g., in a "Playables" folder)
   * Drag an audio file to the left panel of the Timeline editor
 
@@ -897,11 +1196,16 @@
 
 * Animate the scale (i.e., size) of an object in Timeline:
   * Drag the object to the Timeline Editor, then choose Animation Track
+    * Or click on Add button, then Animation Track
+    * me: May need to select Create Animator based on a tutorial
   * Click on the record button
     * If unable to record animation, set Unity Layout to Default and back
+    * Start with first keyframe by moving the object a bit to create a keyframe
   * Set the playhead to 0:00 and set the object scale
   * Set the playhead where desired and set the new object scale
   * Stop recording
+  * Add more keyframes
+    * May need to expand property to edit it
 
 * For more flexibility in animation, including adding more keyframes,
   use the Animaton Window:
@@ -916,7 +1220,7 @@
   like a property of the Skybox (which is a Material, not a GameObject),
   write a script that controls it and animate the script's property.
 
-* Add animatior to Timeline:
+* Add animator to Timeline:
   * Click + in Timeline and choose Animation Track
   * Drag object w/ animation to Animator slot
   * Select Create Animator
@@ -926,15 +1230,26 @@
 
 * Animation concepts:
   * Animation clip is one animation (like a property changing over time)
-* Animator controller references animation clips and organizes them
-  in a flowchart
-  * Double-clicking opens the Animator window
-* Animator component goes on a GameObject and takes an animator controller
-  and avatar
+  * Animator controller references animation clips and organizes them
+    in a flowchart
+    * Double-clicking opens the Animator window
+  * Animator component goes on a GameObject and takes an animator controller
+    and avatar
 
 * Signal track: Track that lets you emit signals, which then call a function
   from a script. Can be used to customize animating an object
   to move from one location to the next.
+
+* Control a timeline within another timeline
+  * Use case: control waves of enemies that have their own timeline
+  * Add a Control Track to the parent timeline
+  * Drag the child timeline to the Control Track
+  * Adjust the child timeline (where to begin or stretch)
+
+* Use Control Track to turn on/off UI elements
+  * Drag UI element (e.g., Image) to the timeline and it will create
+    a Control Track
+  * Adjust the Control Track to determine when and how long element is active
 
 ## UI
 
@@ -1017,11 +1332,21 @@
     * Drag the TextMeshPro object to the script's slot in Inspector
   * Update its ``text`` property programmatically
 
+* To use a custom font with TextMesh Pro:
+  * Fonts: https://www.dafont.com
+  * Drag font file to Assets
+  * Go to Window -> TextMeshPro -> Font Asset Creator
+  * Select font from Assets
+  * Click on Generate button
+
 * Make the Toggle do something when toggled/untoggled:
   * In the Inspector, there is a Toggle component,
     which has an "On Value Changed" event
   * Drag an object and select the function to run
   * Or, code what to do programmatically
+
+* Image
+  * The image to bring in should have Texture Type of Sprite (2D and UI)
 
 ### Info Bubble
 
@@ -1069,8 +1394,40 @@
 
 ## Terrain
 
-* Unity comes with a Terrain editor:
-  * [https://docs.unity3d.com/Manual/script-Terrain.html](https://docs.unity3d.com/Manual/script-Terrain.html)
+* Unity guide on the Terrain editor:
+  * https://docs.unity3d.com/Manual/script-Terrain.html
+
+* Add Terrain
+  * Add 3D Object -> Terrain
+
+* Configure Terrain
+  * Click on "Terrain Settings" button
+
+* Create hills
+  * Select "Paint Terrain" and paint hills on terrain
+  * Press Shift while painting to remove hills
+  * Decrease or increase brush size with [ and ]
+  * Decrease Opacity for lower hills
+
+* Paint to a specific height
+  * Change paint mode to "Set Height"
+  * Specify the Height
+  * Use to set higher Height and create valleys
+    * Will then want to set Y of terrain to negative to bring down sea level
+      to 0
+
+* For more Terrain Tools, install it from Package Manager
+
+* Paint textures on terrain:
+  * Select "Paint Texture" mode
+  * Add Layers (e.g., dirt, rock from Terrain Tools)
+
+* Add trees:
+  * In Terran properties, click on "Paint Trees" button
+  * Click on Edit Trees... then Add Tree
+  * Select a tree Prefab
+    * The Standard Assets package has some tree prefabs
+    * Can add more trees if desired
 
 ## Code
 
@@ -1079,6 +1436,10 @@
 * ``OnEnable()`` is called when the object is enabled and active.
 
 * ``Time.time`` is the number of seconds since the game started.
+
+* Call a method after ``x`` seconds:
+
+      Invoke("MethodName", x);
 
 * Perform something every x seconds:
   * Use a coroutine that returns ``new WaitForSeconds(x)``
@@ -1098,6 +1459,41 @@
   before destroying the object.
 
 * Store player data (e.g., settings, player name, etc.) using ``PlayerPrefs``.
+
+### Messaging
+
+* ``BroadcastMessage("MethodName")``
+  * Calls the method MethodName on the attached gameObject or its children
+  * Eliminates the use of ``GetComponent<Component>().MethodName()``
+    because it will automatically find MethodName in any Component of gameObject
+
+### Shoot From Weapon
+
+    // In Update() of the Weapon Component:
+
+    // Use camera for FPS, but probably want to use weapon in VR
+    if (Physics.Raycast(camera.transform.position, camera.transform.forward,
+        out RaycastHit hit, range))
+    {
+        EnemyHealth target = hit.transform.GetComponent<EnemyHealth>();
+        target.TakeDamage(30.0f);  // make 30.0 a SerializeField
+    }
+
+    // Track of enemy health (as a Component)
+    public class EnemyHealth : MonoBehavior
+    {
+        [SerializeField] float hitPoints = 100.0f;
+
+        public void TakeDamage(float damage)
+        {
+            hitPoints -= damage;
+            if (hitPoints <= 0)
+                Destroy(gameObject);
+        }
+    }
+
+* Weapon zoom:
+  * Decrease camera Field of View (``Camera.fieldOfView``)
 
 ### ScriptableObject
 
@@ -1264,6 +1660,10 @@
 
 * Some mesh optimization can be done via the Unity import options.
 
+* See Unity e-books:
+  * https://resources.unity.com/games/unity-e-book-optimize-your-mobile-game-performance
+  * https://resources.unity.com/games/performance-optimization-e-book-console-pc
+
 ## Build Settings
 
 * Color space
@@ -1281,8 +1681,31 @@
   * Move it out of its parent (preserves world location)
   * Delete the old object
 
+* Draw a sphere around an object when selected:
+
+      // Method on object (like Update)
+      void OnDrawGizmosSelected()
+      {
+          Gizmos.color = Color.red;
+          Gizmos.DrawWireSphere(transform.positon, radius);
+      }
+
 * Editor scripts extend the features of the Unity editor.
-  For example, one could be used to add a menu option to instantiate
-  prefab objects into the Hierarchy.
   * See https://docs.unity3d.com/Manual/ExtendingTheEditor.html
   * Tutorial: https://unity3d.com/learn/tutorials/topics/scripting/editor-scripting-intro
+
+## Resources
+
+* Models
+  * Gun with shooting animation and script, submodels for trigger,
+    slider, etc.
+    * Unity Asset store, search for "Modern guns nokobot"
+    * Use Nokobot -> Modern Guns - Handgun -> \_Prefabs ->
+      Handgun Black -> M1911 Handgun_Black (Shooting)
+
+* Videos
+  * [Scriptable Objects by Richard Fine (Unite 2016)](https://www.youtube.com/watch?v=6vmRwLYWNRo)
+
+* Websites
+  * Beginner Scripting: https://learn.unity.com/project/beginner-gameplay-scripting
+  * Create with Code: https://learn.unity.com/course/create-with-code?uv=2020.3
