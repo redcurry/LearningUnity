@@ -42,70 +42,70 @@
     (i.e., a collision happens)
     * me: Is it called only on one of the objects or both?
     * For example, destroy itself if it collides with objects with tag
-      "Destructor" 
+      "Destructor"
   * ``OnCollisionStay``: called as long as an object is colliding
-    with self and the object has not entered "sleep" mode 
-    * To change Sleep threshold, go to Project Settings -> Physics 
+    with self and the object has not entered "sleep" mode
+    * To change Sleep threshold, go to Project Settings -> Physics
   * ``OnCollisionExit``: called when an object is done colliding with self
 
 * Trigger events callbacks:
   * ``OnTriggerEnter``, ``OnTriggerStay``, ``OnTriggerExit``
-  * Similar to collision events, but sleep mode does not apply 
-  * Example use case: player enters a trigger area that causes rocks to fall 
+  * Similar to collision events, but sleep mode does not apply
+  * Example use case: player enters a trigger area that causes rocks to fall
 
 * Rigidbody component:
   * Mass is in kilograms (by default)
   * Drag is air resistance
   * Angular drag is the resistance to the rotational value
-    * Simulates as if an object was filled with liquid 
+    * Simulates as if an object was filled with liquid
   * Interpolate: fixes jitter due to the fact that graphics and physics
-    run at different rates 
-    * Commonly used on the player's character, disabled for everything else 
-  * Collision Detection: how often to do collision detection 
-    * Use Continuous for fast moving objects that need collision detection 
+    run at different rates
+    * Commonly used on the player's character, disabled for everything else
+  * Collision Detection: how often to do collision detection
+    * Use Continuous for fast moving objects that need collision detection
   * Specify constraints (position and rotation) to prevent physics
-    for applying on those axes 
+    for applying on those axes
 
-* Is Kinematic releases control of the object from physics 
-  * Gravity no longer applies 
-  * Useful to let an animation take over rather than physics 
+* Is Kinematic releases control of the object from physics
+  * Gravity no longer applies
+  * Useful to let an animation take over rather than physics
   * For example, a character may be controlled by an animation
     (Is Kinematic = true) until it dies, where ragdoll physics
     can take over (Is Kinematic = false)
 
-* Mesh collider is not performant (so use sparingly). 
+* Mesh collider is not performant (so use sparingly).
   * For a Mesh collider, you can specify a different mesh
-    than the object itself (for example, to simplify the mesh) 
-  * You can also set to Convex to simplify the mesh 
+    than the object itself (for example, to simplify the mesh)
+  * You can also set to Convex to simplify the mesh
   * If not using Convex, and object is also a Rigidbody,
-    you may get an error that is solved by making the mesh collider Convex 
+    you may get an error that is solved by making the mesh collider Convex
   * Instead of a mesh collider, it's best to use multiple basic colliders.
 
-* Compound collider 
-  * Multiple colliders to represent the shape of an object 
+* Compound collider
+  * Multiple colliders to represent the shape of an object
 
 ### Wheel Collider
 
 * Build a car with wheel colliders:
-  * Create a Rigidbody around the whole car model 
+  * Create a Rigidbody around the whole car model
   * Create a collider around the body of the car
-    (don't let the collider touch the ground) 
+    (don't let the collider touch the ground)
   * For each wheel, create an empty child object where the collider will go,
     and then move it out as a sister object (used child only to keep same
-    position) 
-  * Add Wheel Collider component to each new object (can copy-paste) 
-    * Adjust mass (weight of wheel) 
-    * Adjust radius and suspension distance (e.g., 0.2) 
-    * Adjust center of collider 
-    * Adjust wheel damping rate 
-    * Adjust Force App Point Distance (rest position) 
-    * Adjust Suspension Spring (how stiff the suspension is) 
-    * Forward Friction: amount of friction each wheel has while rolling forward 
-    * Sideways Friction: amount of drift if car is sideways 
+    position)
+  * Add Wheel Collider component to each new object (can copy-paste)
+    * Adjust mass (weight of wheel)
+    * Adjust radius and suspension distance (e.g., 0.2)
+    * Adjust center of collider
+    * Adjust wheel damping rate
+    * Adjust Force App Point Distance (rest position)
+    * Adjust Suspension Spring (how stiff the suspension is)
+    * Forward Friction: amount of friction each wheel has while rolling forward
+    * Sideways Friction: amount of drift if car is sideways
   * Write a script so that the wheel mesh position matches the collider center,
-    and then use a Raycast to ensure the wheel does not go into the ground 
+    and then use a Raycast to ensure the wheel does not go into the ground
     * To make the wheels rotate, also write a script to match the collider
-      rotation 
+      rotation
 
 ### Collision Settings
 
@@ -114,32 +114,32 @@
 
 ### Joints
 
-* Fixed joint (component) 
-  * Add the component to an object to attach the object to another 
+* Fixed joint (component)
+  * Add the component to an object to attach the object to another
   * Specify a Break Force to allow it to detach based on a force applied,
-    such as a character walking over the object 
+    such as a character walking over the object
   * The other object (the "Connected Body") may need to be set to Is Kinematic,
-    so it doesn't react to other forces 
- 
-* Sprint joint (component) 
-  * Sample use case: effect of a rope bridge by connect planks with springs 
-  * Add one or more components to add springs that attach to other objects 
-  * Play with the settings to get the effect desired 
- 
-* Hinge joint (component) 
-  * Works like a hinge on a door 
+    so it doesn't react to other forces
+
+* Sprint joint (component)
+  * Sample use case: effect of a rope bridge by connect planks with springs
+  * Add one or more components to add springs that attach to other objects
+  * Play with the settings to get the effect desired
+
+* Hinge joint (component)
+  * Works like a hinge on a door
   * Use Limits and specify Min and Max to set the permitted angles
-    it can hinge around 
+    it can hinge around
   * If affected by gravity, you can set the Bounciness (and related settings)
-    to give it a bounce once the object hits the ground (or another object) 
+    to give it a bounce once the object hits the ground (or another object)
   * Can use a Spring on the hinge to have it spring back to its
     original position after the object swings (because of gravity or
-    another object pushing it), like Old West saloon doors 
-  * Can add a Motor to automatically rotate the object around the hinge 
- 
-* Configurable joint (component) 
-  * Highly customizable joint 
-  * Set the main Axis to specify where the joint goes around 
+    another object pushing it), like Old West saloon doors
+  * Can add a Motor to automatically rotate the object around the hinge
+
+* Configurable joint (component)
+  * Highly customizable joint
+  * Set the main Axis to specify where the joint goes around
   * Angular Drive can specify the springiness
 
 ### Physic Material
@@ -261,12 +261,12 @@
     Intensity Multiplier.
 
 * SkyBox types:
-  * Procedural: Unity-generated; configure sun size, atmosphere, etc. 
-  * Cubemap: Image  
+  * Procedural: Unity-generated; configure sun size, atmosphere, etc.
+  * Cubemap: Image
     * Unity has free cubemaps in AssetStore
 
 * Create custom SkyBox:
-  * Create -> Material 
+  * Create -> Material
   * Set Shader to Skybox, and choose the type
 
 ### Directional Light
@@ -277,9 +277,9 @@
     and assigns it as the sun source.
 
 * Artifacts with directional light:
-  * On some models, the shadow of an object may have holes 
-  * These can be fixed by playing with the Normal Bias and Bias settings 
-  * Try lowering the Normal Bias first, then play with Bias 
+  * On some models, the shadow of an object may have holes
+  * These can be fixed by playing with the Normal Bias and Bias settings
+  * Try lowering the Normal Bias first, then play with Bias
 
 ### Point Light
 
@@ -327,15 +327,15 @@
   in a scene.
 
 * Use light probes when you want indirect lighting on dynamic
-  (non-static) objects 
+  (non-static) objects
 
 * Create a light probe:
-  * Create -> Light -> Light Probe Group 
-  * Resize the cube to encompass the scene (or part of the scene) 
-  * To select probes, first click on "Edit Light Probes" in Inspector 
-  * Add resolution by creating more light probes 
-  * Select some probes, then click on Duplicate 
-  * Focus on adding probes around objects producing light 
+  * Create -> Light -> Light Probe Group
+  * Resize the cube to encompass the scene (or part of the scene)
+  * To select probes, first click on "Edit Light Probes" in Inspector
+  * Add resolution by creating more light probes
+  * Select some probes, then click on Duplicate
+  * Focus on adding probes around objects producing light
 
 ### Reflection Probes
 
@@ -346,14 +346,14 @@
   only reflect the SkyBox.
 
 * Create a reflection probe:
-  * Create -> Light -> Reflection Probe 
-  * Resize reflection cube to encompass what to reflect 
-  * Reflection probe type may be Baked or Realtime 
-    * Baked: works only with Static objects 
+  * Create -> Light -> Reflection Probe
+  * Resize reflection cube to encompass what to reflect
+  * Reflection probe type may be Baked or Realtime
+    * Baked: works only with Static objects
     * Realtime: works with all objects (very expensive, so use sparingly)
       * True realtime: set Refresh mode to Every Frame
   * Even without fully reflective objects, it's good to have
-    a reflection probe because it affects smooth objects 
+    a reflection probe because it affects smooth objects
 
 ## Post-Processing
 
@@ -378,36 +378,36 @@
   * Occlusion Map: accenting surface shadows associated with occlusion
   * Height Map: how objects occlude others
 
-* Albedo map 
-  * Don't include highlights or shadows; just have color 
-  * Also called "diffuse" 
-  * Can apply a tint shift (color selection on the right) 
+* Albedo map
+  * Don't include highlights or shadows; just have color
+  * Also called "diffuse"
+  * Can apply a tint shift (color selection on the right)
 
-* Alpha map (alpha channel of albedo map) 
-  * Best to use PNG or TGA 
-  * Rendering mode 
+* Alpha map (alpha channel of albedo map)
+  * Best to use PNG or TGA
+  * Rendering mode
     * Cutout: make parts of the texture completely transparent
-      depending on threshold 
+      depending on threshold
     * Fade: apply entire alpha map on texture (as a normal picture
-      with an alpha channel) 
+      with an alpha channel)
     * Transparent: Like fade but retains the reflective and shadow properties
-      of the texture (good for glass materials) 
+      of the texture (good for glass materials)
   * In Photoshop, you can go to Channels (next to Layers tab)
-    and add an Alpha channel (if not already there) 
+    and add an Alpha channel (if not already there)
 
-* Metallic map 
+* Metallic map
   * With a map assigned, Red channel describes where metallic effect
-    occurs and Alpha channel describes how smooth (shiny) it is 
+    occurs and Alpha channel describes how smooth (shiny) it is
     * The Alpha channel may be from the metallic map or albedo map
-      (designated by the Source option) 
+      (designated by the Source option)
   * Without a map assigned, you can choose how metallic the whole material is
-    (using the slider) 
+    (using the slider)
   * For efficiency in mobile games, you can turn off Specular Highlights
-    or Reflections (in the Forward Rendering options) 
+    or Reflections (in the Forward Rendering options)
     * Can also control programmatically (e.g., turn off when far from camera)
 
-* Normal map 
-  * Make sure its type is set to Normal map 
+* Normal map
+  * Make sure its type is set to Normal map
   * Can be made to come out as bumps or go in as if material was picked off
 
 * Creating a normal map
@@ -416,30 +416,30 @@
   * In Unity, can create a normal map from a grayscale image,
     such as a height map
 
-* Height map 
+* Height map
   * Similar to normal map, but produces shadows on self,
-    creating a bigger effect of depth within the texture 
+    creating a bigger effect of depth within the texture
 
-* Occlusion map 
-  * Ambient occlusion is the shadow in corners and crevices of an object 
+* Occlusion map
+  * Ambient occlusion is the shadow in corners and crevices of an object
   * For efficiency, occlusion can be included in the albedo map itself
-    (baked occlusion) 
+    (baked occlusion)
   * If using a separate occlusion map, you have more control
     on the amount using the slider
 
-* Emission 
+* Emission
   * Emission map is similar to the metallic map in that it defines
-    where and how much to apply emission 
-  * Global illumination 
-    * Baked: has effect only if baked global illumination is enabled 
+    where and how much to apply emission
+  * Global illumination
+    * Baked: has effect only if baked global illumination is enabled
     * Realtime: (unclear)
 
-* Detail map 
+* Detail map
   * Under Secondary Map, you can specify Detail and Normal maps
-    for an additional "detail" map that's applied within the Detail Mask 
-  * For example, used to add little notches in stone 
-  * Increase Tiling to make the detail smaller 
-  * Play with Offset to remove any seams between tiles 
+    for an additional "detail" map that's applied within the Detail Mask
+  * For example, used to add little notches in stone
+  * Increase Tiling to make the detail smaller
+  * Play with Offset to remove any seams between tiles
 
 * Fresnel reflections: reflections on the edges of an object.
 
@@ -471,19 +471,19 @@
     a specific type (metallic or specular)
 
 * Other shader types:
-  * Unlit: does not use any scene lighting, so highly performant 
-  * Particle: has blending properties 
-  * Mobile: performant (but simplified) shaders 
+  * Unlit: does not use any scene lighting, so highly performant
+  * Particle: has blending properties
+  * Mobile: performant (but simplified) shaders
   * Standard: performance decreases with more maps used
 
 * Custom shader types:
-  * Standard: comes w/ generated code, interacts with lighting 
-  * Vertex and Fragment: does not need to interact with lighting 
-  * Fixed function: legacy, simple effects 
- 
+  * Standard: comes w/ generated code, interacts with lighting
+  * Vertex and Fragment: does not need to interact with lighting
+  * Fixed function: legacy, simple effects
+
 * Create a custom shader:
   * Use Unity Shader Graph
-  * Or, Create -> Shader, then choose the type 
+  * Or, Create -> Shader, then choose the type
     * Cg programming language
 
 ## Textures
@@ -515,18 +515,18 @@
     screen
 
 * Deferred rendering:
-  * No limits on the number of lights that can affect an object 
-  * Lights evaluated per pixel (smooth and natural) 
-  * Processor intensive 
-  * Does not support anti-aliasing 
-  * Cannot render semi-transparent objects 
+  * No limits on the number of lights that can affect an object
+  * Lights evaluated per pixel (smooth and natural)
+  * Processor intensive
+  * Does not support anti-aliasing
+  * Cannot render semi-transparent objects
 
 * Forward rendering:
-  * Objects can only be lit by up to four lights 
-  * Some lights rendered per pixel, remaining per vertex 
-  * Does not support cookies or normal maps 
-  * Limit of one light that can cast shadows 
-  * Very fast (practically zero Processor cost) 
+  * Objects can only be lit by up to four lights
+  * Some lights rendered per pixel, remaining per vertex
+  * Does not support cookies or normal maps
+  * Limit of one light that can cast shadows
+  * Very fast (practically zero Processor cost)
   * Ideal for mobile devices
 
 * HDRP and URP and the new render pipeline templates in Unity (2019 and later).
@@ -763,82 +763,82 @@
     and move the handles horizontally (effects timing)
     or vertically (affects values)
 
-* Animation events 
+* Animation events
   * At any moment in time, you can add an event (click on the upper-right
-    button, next to the add keyframe button) 
+    button, next to the add keyframe button)
   * Link the event to an existing method of a component attached to the object
     being animated
 
-* Animator controller 
+* Animator controller
   * When an animation clip is created, an animatior controller
     is automatically created and the Animator component on the animated object
-    is linked to that new controller 
-  * The Entry box specifies which animation clip to start when the game starts 
+    is linked to that new controller
+  * The Entry box specifies which animation clip to start when the game starts
     * To not start animating anything, create an empty "idle" clip
-      and assign it as the default state, so that Entry points to it 
+      and assign it as the default state, so that Entry points to it
   * When creating a Transition, by default when an animatior clip ends,
-    it goes to the next one in the transition. 
+    it goes to the next one in the transition.
     * To not go to the next clip, uncheck the Has Exit Time property
-      of the Transition 
+      of the Transition
 
 * Control when to play the next animation clip:
-  * Click on the add parameter button and choose a type (e.g., bool) 
+  * Click on the add parameter button and choose a type (e.g., bool)
   * Click on a Transiton and set the Conditions based on the parameter value
     to specify when to activate the transition
 
-* Scripting animator parameters 
-  * First, get the Animator component (example, call it "anim") 
-  * Call Set\* methods on the Animator object 
+* Scripting animator parameters
+  * First, get the Animator component (example, call it "anim")
+  * Call Set\* methods on the Animator object
   * Example, ``anim.SetBool("isOpen", true);``
 
-* Rig import settings 
+* Rig import settings
   * Once a rigged model has been added to Assets, select it and click on Rig
-    tab in the Inspector 
-  * Animation Type 
-    * Generic: Creates avatars based on bones (no humanoid features) 
-    * Humanoid: Helpful for animations that could be retargeted to other models 
-  * If choosing Humanoid Animation Type 
-    * Select Create From This Model for Avatar 
-    * Click on Apply, and then click on Configure 
+    tab in the Inspector
+  * Animation Type
+    * Generic: Creates avatars based on bones (no humanoid features)
+    * Humanoid: Helpful for animations that could be retargeted to other models
+  * If choosing Humanoid Animation Type
+    * Select Create From This Model for Avatar
+    * Click on Apply, and then click on Configure
     * On the green map figure, solid circles are mandatory bones,
-      and dashed circles are optional 
+      and dashed circles are optional
     * Unity may have automatically mapped the bones; if not, click on
-      Mapping dropdown, then on Automap 
-    * To accept, click on Apply 
-  * Click on the Muscles and Settings tab 
+      Mapping dropdown, then on Automap
+    * To accept, click on Apply
+  * Click on the Muscles and Settings tab
     * In Muscle Group Preview, drag the preview sliders to ensure
-      the mapping is correct 
+      the mapping is correct
     * In the Per-Muscle Settings, you can adjust the mix and max range
-      of motion 
+      of motion
 
-* Animation import settings 
-  * Import an animation 
-  * Select it and click on the Rig tab 
-  * Choose Humanoid animation type 
-  * Choose Copy from Other Avatar 
-  * Choose the Source for the avatar to an existing model and click Apply 
+* Animation import settings
+  * Import an animation
+  * Select it and click on the Rig tab
+  * Choose Humanoid animation type
+  * Choose Copy from Other Avatar
+  * Choose the Source for the avatar to an existing model and click Apply
     * I got an mis-match error when I tried it with a Mixamo animatior,
-      so I chose Create from this Model, configured it, and clicked on Apply 
-  * Click on Animations tab 
-  * Can specify Start and End of animation to use 
-  * Set Loop Time if the animation should loop 
+      so I chose Create from this Model, configured it, and clicked on Apply
+  * Click on Animations tab
+  * Can specify Start and End of animation to use
+  * Set Loop Time if the animation should loop
     * Check Loop Pose if there's a mismatch between start and end of animation
-      for looping 
-    * Root Transform Rotation/Position 
-      * Can be based on Original or Feet, and have an Offset 
+      for looping
+    * Root Transform Rotation/Position
+      * Can be based on Original or Feet, and have an Offset
       * If Average velocity or angular speed are not exactly 0.000,
-        check Bake into Pose to avoid drifting (especially in a loop animation) 
+        check Bake into Pose to avoid drifting (especially in a loop animation)
   * For a walking animation, make sure that the average velocity only moves
-    in the Z direction and the angular speed is 0 
-    * If they're not, play with the Offsets and/or Bake Into Pose 
-    * For sample walking Mixamo animation, this worked: 
-      * Loop Time (checked), Loop Pose (checked) 
+    in the Z direction and the angular speed is 0
+    * If they're not, play with the Offsets and/or Bake Into Pose
+    * For sample walking Mixamo animation, this worked:
+      * Loop Time (checked), Loop Pose (checked)
       * Root Transform Rotation, Bake Into Pose (checked),
-        Based Upon Body Orientation, Offset 0 
+        Based Upon Body Orientation, Offset 0
       * Root Transform Position (Y), Bake Into Pose (checked),
-        Based Upon Feet, Offset 0 
+        Based Upon Feet, Offset 0
       * Root Transform Position (XZ), Bake Into Pose (unchecked),
-        Based Upon Center of Mass 
+        Based Upon Center of Mass
 
 * Check out DOTween package for an animation API.
 
@@ -858,25 +858,25 @@
     uncheck Automate Threshold and enter the thresholds for each animation
   * One can work with more complex blends by changing the Blend Type
 
-* Animation layers 
-  * Allows you to blend layers together 
-  * Put common animations in the Base Layer 
-  * Put, for example, attack animations in additional layer 
-  * Create a new layer and name it 
-  * Add animations as needed 
-    * May need to create an Empty start as Entry 
-  * Click on the "cogwheel" to open layer settings 
-  * The Weight controls how much of a layer shows up 
-  * Blending Override overrides the base layer 
-  * Blending Additive adds animation on top of base layer 
+* Animation layers
+  * Allows you to blend layers together
+  * Put common animations in the Base Layer
+  * Put, for example, attack animations in additional layer
+  * Create a new layer and name it
+  * Add animations as needed
+    * May need to create an Empty start as Entry
+  * Click on the "cogwheel" to open layer settings
+  * The Weight controls how much of a layer shows up
+  * Blending Override overrides the base layer
+  * Blending Additive adds animation on top of base layer
   * Is scripting, use SetLayerWeight of the Animator component
 
-* Avatar masks 
-  * Create -> Avatar mask, and name it 
-  * Expand Humanoid in Inspector 
-  * Click on body part to mask that part 
-    * May want to mask root motion (and/or IK) as well 
-  * Set the mask on Animation Layer via the cogwheel 
+* Avatar masks
+  * Create -> Avatar mask, and name it
+  * Expand Humanoid in Inspector
+  * Click on body part to mask that part
+    * May want to mask root motion (and/or IK) as well
+  * Set the mask on Animation Layer via the cogwheel
 
 ## Timeline
 
