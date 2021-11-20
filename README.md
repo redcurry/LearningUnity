@@ -306,8 +306,8 @@
   * How light mode (Submode) and type of object (Static or not)
     interact to form direct and indirect lighting:
 
-| Lighting Mode          | Dynamic Receiver                     | Static Receiver                     |
-| ---------------------- | ------------------------------------ | ----------------------------------- |
+| Lighting Mode          | Dynamic Receiver | Dynamic Receiver  | Static Receiver | Static Receiver   |
+| ---------------------- | ---------------- | ----------------- | --------------- | ----------------- |
 |                        | Direct Lighting  | Indirect Lighting | Direct Lighting | Indirect Lighting |
 | ---------------------- | ---------------- | ----------------- | --------------- | ----------------- |
 | Realtime               | Realtime         | None              | Realtime        | None              |
