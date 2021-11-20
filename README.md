@@ -309,7 +309,6 @@
 | Lighting Mode          | Dynamic Receiver | Dynamic Receiver  | Static Receiver | Static Receiver   |
 | ---------------------- | ---------------- | ----------------- | --------------- | ----------------- |
 |                        | Direct Lighting  | Indirect Lighting | Direct Lighting | Indirect Lighting |
-| ---------------------- | ---------------- | ----------------- | --------------- | ----------------- |
 | Realtime               | Realtime         | None              | Realtime        | None              |
 | Realtime GI            | Realtime         |                   | Realtime        | Realtime Lightmap |
 | Baked                  |                  |                   | Lightmap        | Lightmap          |
