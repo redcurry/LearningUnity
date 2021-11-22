@@ -827,9 +827,6 @@
 
 ## Particle System
 
-* Note: The Particle System will be soon replaced
-  by the Visual Effects (VFX) Graph.
-
 * Create a new particle system:
   * Create an Empty Object
   * Add component ParticleSystem
@@ -839,10 +836,145 @@
 
       particleSystem.Play();
 
+* Many numerical properties of the particle system can be a constant,
+  a curve, or random between two constants or curves.
+
+* When creating projectile effects, use Rate over Distance in the
+  Emission section, as it will produce effects only when it moves
+
 * Turn on Collision to interact with the scene:
   * Type World collides with anything in the world
   * Turn on Send Collision Message
   * Detect with ``OnParticleCollision()``
+
+* For more flexibility with the particle rendering, use a custom shader:
+  * Create -> Shader -> Universal Render Pipeline -> Unlit Shader Graph
+  * Double-click to edit in Shader Graph
+  * Change the preview window to use a Quad
+  * Add Color and Texture2D (name it "MainTexture") properties
+    * Set Color of the Color to be HDR
+    * Set Default of the Texture2D to be Default-Particle
+  * Add a Sample Texture 2D node and a Multiply node
+  * Connect Color to input of Multiply node
+  * Connect Texture2D as input of Sample Texture 2D,
+    and connect its output to Multiply node
+  * Add a Vertex Color node and a second Multiply node
+  * Connect output of first Multiply node to the second Multiply node
+  * Connect output of Vertex Color to the second Multiply node
+  * Add a Split node
+  * Connect output of the second Multiply node to the Split node
+  * Connect output of the Split node to the Alpha of the Fragment
+  * Connect output of the second Multiply node (again) to the Base Color
+    of the Fragment
+  * Click on Save Asset
+  * In Unity Editor window, right-click the new shader and then
+    Create -> Material
+  * Click on the new material and set its Color and MainTexture
+    * MainTexture could be the Default-Particle or a custom texture (see below)
+  * Drag and drop this material on the Material slot of the particle system
+    (in the Render section)
+
+* Create a custom texture to use for the particle material:
+  * Open Photoshop and create a new image (e.g., 512x512)
+  * Paint the whole image black
+  * Add a new layer
+  * Select the brush tool
+    * Set brush size to half the image size, and the hardness to 0%
+    * Set color to white
+  * Click once in the middle of the image to create a single soft dot
+    * Optionally, modify the dot to make a unique pattern
+  * Select both layers and align horizontally and vertically to center the dot
+  * Hide the background layer
+  * Export as a PNG to the Unity project
+  * Drag new texture to the particle material's texture slot
+
+* Create sparks (from Udemy VFX course):
+  * Name the ParticleSystem object as "Sparks"
+  * Set Duration to 1.0
+  * Set Emission rate to 50
+  * Set Start Lifetime to be random between 0.7 and 2
+  * Set Start Speed to be random between 1 and 15
+  * Set Start Size to be random between 0.05 and 0.2
+  * Set Gravity to 1
+  * Set Simulation Space to World
+  * Open Shape section
+    * Set Radius to 0.1
+    * Set Angle to 20
+  * Open Render section
+    * Set Render Mode to Stretched Billboard
+    * Set Speed Scale to 0.1
+    * Set Length Scale to 1
+    * Set Max Particle Size to 3
+  * Open and turn on Collision
+    * Set Type to World
+      * Make sure the scene's ground also has a collider
+    * Set Dampen to 0.5
+    * Set Bounce to 0.5
+  * Open and enable Color over Lifetime
+    * Set gradient to be between yellow and deep orange
+    * Decrease Alpha of the end to around 128
+    * Change Color to be random between two gradients
+    * Copy/paste the first gradient into the second
+    * Set second gradient to be between brighter yellow and orange/red
+  * Open and enable Sive of Lifetime
+    * Set to something that decreases in size
+  * Duplicate the "Sparks" particle system and name it "Beam"
+  * Set Start Lifetime to be random between 0.2 and 0.5
+  * Set Start Speed to 0
+  * Set Start Size to be random between 0.5 and 0.7
+  * Set Gravity to 0
+  * Set Simulation Space to Local
+  * Open Emission and set Rate over Time to 5
+  * Disable Shape and Collision
+  * Open Render and set Type to Billboard
+  * Open Size over Lifetime
+    * Change curve to have an undulating shape (add 5 keys to do it)
+      between around 0.9 and 1
+  * Duplicate the "Beam" particle system and name it "Shiny"
+  * Set Start Lifetime to be random between 0.3 and 0.6
+  * Enable 3D Start Size and set to be random between (2.5, 0.25, 1)
+    and (1, 0.1, 1)
+  * Set Start Rotation to be between -360 and 360
+  * Set Emission Rate over Time to 15
+  * Set Color over Lifetime to be a single gradient,
+    going from Alpha 0 to 255 to 0, and all colors are white
+  * Set Start Color to be random between hsva (39, 77, 100, 14)
+    and hsva (21, 21, 100, 20)
+  * Set Size over Lifetime to decrease
+  * Move Sparks and Shiny to be children of Beam,
+    so you can see all particle systems play at the same time
+
+* Create a "hit" with quick sparks:
+  * Duplicate the object with the particle system above
+  * Drag to Prefabs to treate a new prefab out of it
+  * Select particle system and its children and disable Looping
+  * Set Emission Rate over Time to 0
+  * Select "Beam" particle system
+  * In Emission section, add one Burst with Count of 1
+  * Set Color over Lifetime to one Color,
+    and make it go from Solid yellow/orange to pure Transparent
+  * Set Size over Lifetime to a decreasing curve
+  * Set Start Color to a lower Alpha
+    * Instructor did 15, but it seemed too low, so I did 75
+  * Set Start Size to 2
+  * Set Start Lifetime to 0.4
+  * Select "Sparks" particle system
+  * In Emission section, add one Burst with Count of 30
+  * Rotate "Beam" object -90 degrees in the X axis so it faces up
+  * Change "Sparks" Shape Angle to 60 degrees
+  * Set Start Lifetime to be random between 0.5 and 1.5
+  * Add Burst to "Shiny" and set count to 10
+  * Change Color over Lifetime to go from full opaque to full transparent
+  * In Start Color, make the second color more orange
+  * Change 3D Start Size X to 3.5
+  * Change Start Lifetime to be random between 0.2 and 0.40
+  * Duplicate the "Beam", name it "Flash", and delete its children
+  * Set Start Lifetime to 0.2
+  * Set Start Size to 6
+  * Move as a child of "Beam"
+  * Experiment with colors by changing yellow/green to blue or green
+    * For those with two colors (because it's using random between colors),
+      leave one of them as yellow to get a mix of sparks and beams
 
 * When creating explosions, may want to instantiate a particle system prefab
   (rather than have it as a child object), so that it survives
