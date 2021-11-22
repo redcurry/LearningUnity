@@ -998,6 +998,7 @@
 * Enable XR on a project:
   * Go to Window -> Package Manager and enable preview packages
   * Install the XR Interaction Toolkit
+  * Install XR Plugin Management
 
 * Add an XR Rig:
   * Create -> XR -> Stationary (or Room-scale) XR Rig
