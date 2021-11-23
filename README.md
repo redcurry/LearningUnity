@@ -998,6 +998,7 @@
 * Enable XR on a project:
   * Go to Window -> Package Manager and enable preview packages
   * Install the XR Interaction Toolkit
+    * Also install Samples: Default Input Actions and XR Device Simulator
   * Install XR Plugin Management
 
 * Add an XR Rig:
@@ -1005,6 +1006,12 @@
   * Note that there are two types of XR Rigs:
     * Device-based (under the Device-based menu): directly access controllers
     * Action-based: indirect access, takes advantage of the XR Input System
+  * Browse to Assets -> Samples -> XR Interaction Toolkit ->
+    1.0.0-pre8 -> Default Input Actions
+  * Drag each XRI Default controller preset to the corresponding XR Controller
+  * Create an empty object and call it "Input Action Manager"
+  * Add the Input Action Manager component to it
+  * Set the Action Assets to the XRI Default Input Actions
 
 * Stationary vs room-scale XR Rig:
   * Stationary: the Tracking Origin Mode is set to Device
@@ -1028,13 +1035,15 @@
   * Back in Build Settings, change Texture Compression to ASTC
 
 * Optimization settings for Oculus Quest:
-  * Open Project Settings
+  * Open Project Settings -> Quality
   * Create a new Quality Level, name it Oculus Quest
-    * Uncheck all other Quality Levels
+  * Set the Oculus Quest level as the Default for Android
+  * Close window
+  * Duplicate UniversalRP-HighQuality and name UniversalRP-OculusQuality
   * Set Pixel Light Count to 1
-  * Anisotorpic Texture: Per Texture
   * Anti Aliasing: 4x
-  * Disable Soft Particles
+  * Go back to Player Settings -> Quality, and change the Rendering
+    setting to UniversalRP-OculusQuality
 
 * Quickly Build and Run for the Quest with File -> Build and Run.
 
