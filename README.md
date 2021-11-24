@@ -1109,7 +1109,30 @@
   * Anchor teleportation: teleport to a specific location (and orientation)
   * [https://github.com/Unity-Technologies/XR-Interaction-Toolkit-Examples](https://github.com/Unity-Technologies/XR-Interaction-Toolkit-Examples)
 
-* Teleportation and snap turn:
+* Teleportation and snap turn (new way, action-based):
+  * Create an empty object, name it "Locomotion System" and
+    add the Locomotion System component to it
+  * Add Teleportation Provider component to XR Rig, and drag
+    Locomotion System to slot
+  * In Samples folder, drag XRI Default Snap Turn to the XR Rig,
+    and drag Locomotion System to it
+  * Rename the "LeftHand Controller" to "LeftHand Teleport"
+  * Disable the XR Interactor Line Visual
+  * In XR Controller component, drag the XRI LeftHand/Teleport Mode Activate
+    to the Select Action Reference
+  * Disable all other Actions
+  * In XR Ray Interactor, set Interaction Layer Mask to Teleportation
+    (will need to create one), Line Type to Projectile, and Velocity to 8
+  * In XR Ray Interactor, add Select Entered Action (in Interaction Events)
+    and drag the XR Interactor Line Visual, choose enabled function,
+    and check the checkbox
+  * Do the same thing for Select Exited Action but leave checkbox unchecked
+  * Repeat the steps for the RightHand Controller
+  * Drag XRI Default Left (and Right) Controllers to have a non-teleport set
+  * Make the floor a Teleportation Area and set Layer Mask to Teleportation
+
+
+* Teleportation and snap turn (old way):
   * Add Locomotion System component to XR Rig, and drag XR Rig to slot
   * Add Teleportation Provider component, and drag Locomotion System to slot
   * Add Snap Turn Provider, and drag locomotion System to slot
