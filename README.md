@@ -1605,8 +1605,7 @@
 
       Invoke("MethodName", x);
 
-* Perform something every x seconds:
-  * Use a coroutine that returns ``new WaitForSeconds(x)``
+* To perform something every x seconds, use ``InvokeRepeating``.
 
 * Loop through an object's children (it's important to not use ``var``
   in the ``foreach`` statement, otherwise it's interpreted as an Object,
@@ -1623,6 +1622,56 @@
   before destroying the object.
 
 * Store player data (e.g., settings, player name, etc.) using ``PlayerPrefs``.
+
+### Coroutine
+
+* A coroutine needs to return ``IEnumerable``. Use ``yield return null``
+  to pause the execution of a coroutine and resume in the following frame.
+
+      IEnumerator Fade()
+      {
+          Color c = renderer.material.color;
+          for (float alpha = 1f; alpha >= 0; alpha -= 0.1f)
+          {
+              c.a = alpha;
+              renderer.material.color = c;
+              yield return null;
+          }
+      }
+
+* To start a coroutine, call ``StartCoroutine`` and pass a call
+  to the function:
+
+      StartCoroutine(Fade());  // call the function inside
+
+* Instead of resuming in the following frame, a coroutine can resume
+  after a specific amount of time by using
+  ``yield return new WaitForSeconds(0.1f)``.
+
+* There are cases where you don't need to perform an action on every frame,
+  so use a coroutine with ``WaitForSeconds``. For example:
+
+      IEnumerator DoCheck()
+      {
+          for (;;)
+          {
+              if (ProximityCheck())
+              {
+                  // Do something here
+              }
+
+              yield return new WaitForSeconds(0.1f);
+          }
+      }
+
+* A coroutine can be stopped with ``StopCoroutine`` and
+  ``StopAllCoroutines`` (which applies to all coroutines for this behavior).
+
+* A coroutine is automatically stops if:
+  * ``SetActive`` is set to false
+  * Called ``Destroy`` on the instance
+
+* A coroutine is not automatically stops by setting ``enabled`` to false.
 
 ### Messaging
 
@@ -1768,6 +1817,7 @@
 
 * Code recommendations:
   * Don't perform things on every Update if not needed; use a Coroutine instead
+    (with ``WaitForSeconds``).
   * To find an object, don use Object.Find().
     Instead, set it in a slot in Inspector or use a Tag or Layer
     (to limit the search).
