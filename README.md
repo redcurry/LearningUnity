@@ -576,6 +576,14 @@
 
 ## Post-Processing
 
+* The Universal Render Pipeline is not compatible with the Post-Processing
+  Packgage (v2). Instead, use its integrated post-processing effects:
+  * Select a camera and check the Post Processing checkbox
+  * Create -> GameObject -> Volume -> Global Volume
+  * Select the Global Volume object and next to the Profile label
+    (in the Volume component) click on New
+  * Click on Add Override to add an effect
+
 * Add post-processing (version 2):
   * Add post-processing package (version 2) from Package Manager
   * Create a Post Processing Profile in Project View
