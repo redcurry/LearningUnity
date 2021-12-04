@@ -1079,6 +1079,8 @@
 
 * Use a Direct Interactor (instead of Ray Interactor):
   * Add XR -> Direct Interactor object to Hierarchy
+    * If already have a controller, add the Direct Interactor component
+      and also a collider (i.e., sphere collider) with IsTrigger = true
   * Set its Controller Node to Left or Right hand
   * Move as child of Camera Offset (in XR Rig), reset its Transform
   * Optionally move any hand objects from an existing controller
