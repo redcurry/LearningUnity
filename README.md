@@ -1746,11 +1746,36 @@
   referenced by other objects that need to know about the player's health.
   There is no need to use events.
 
+* As another example, they can be used to hold shared properties about
+  NPCs (e.g., max health) so that this "health configuration" is in one place.
+
 * Use the ``CreateAssetMenu`` attribute to add a ``ScriptableObject``
   to the Asset menu bar in the Unity editor.
 
-* Popular video on ``ScriptableObjects``:
-  [https://www.youtube.com/watch?v=raQ3iHhE_Kk](https://www.youtube.com/watch?v=raQ3iHhE_Kk)
+* Use scriptable objects to hold data from expensive text formats
+  (such as JSON or XML) which are slower to load.
+
+* Can use scriptable objects as a better enum:
+  * For example, a ``GameItemSlot`` (like Weapon, Armor) could be a
+    scriptable object and be used to tell where certain game items belong to.
+  * Now it is easy for the designer to add more game item slot types.
+  * It can also be extended to have properties, such as ``IsEquippable``
+    to determine whether those items can be equipped by the player.
+
+* Scriptable objects can also have behavior (methods).
+  * An example is a ``GameItemEffect``, which the designer can drag and drop
+    to game items to add/remove effects to that item.
+  * The ``GameItemEffect`` class can have methods that add/remove stat points
+    to the player when equipped (e.g., health, armor, etc.)
+
+* Scriptable objects can also hold logic.
+  * For example, in the game object's ``Update()`` method,
+    the specific logic could be delegated to a scriptable object.
+  * It's flexible because the logic could be swapped for another type of logic.
+
+* Videos on ``ScriptableObjects``:
+  * https://www.youtube.com/watch?v=raQ3iHhE_Kk
+  * https://www.youtube.com/watch?v=VtuSKmfrFDU
 
 ### Animation
 
