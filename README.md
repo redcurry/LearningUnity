@@ -244,6 +244,14 @@
 * ``Input.GetButtonDown/Up`` returns true only once:
   in the frame the button was pressed down/up, not while it's down/up
 
+* Write ``OnMouseDown`` method to respond to mouse clicks
+  (object must have a collider):
+
+      void OnMouseDown()
+      {
+          // Code here
+      }
+
 ## Lighting
 
 * Unity recommends choosing the lighting strategy early in development.
@@ -1633,9 +1641,20 @@
 
 * Store player data (e.g., settings, player name, etc.) using ``PlayerPrefs``.
 
+* Rotate an object a specific number of degrees around an axis:
+
+      // Use World coordinates
+      transform.Rotate(Vector3.right, angleX, Space.World);
+
+      // Use Local coordinates
+      transform.Rotate(transform.right, angleX, Space.World);
+
+      // This *may* be the same as above (Local), but I'm not sure
+      transform.Rotate(Vector3.right, angleX, Space.Self);
+
 ### Coroutine
 
-* A coroutine needs to return ``IEnumerable``. Use ``yield return null``
+* A coroutine needs to return ``IEnumerator``. Use ``yield return null``
   to pause the execution of a coroutine and resume in the following frame.
 
       IEnumerator Fade()
@@ -1742,11 +1761,42 @@
 
 * Point an object toward another:
 
-      object.transform.LookAt(anotherObject)
+      // This "snaps" immediately, not smoothly
+      object.transform.LookAt(anotherObject);
+
+      // This is smoothly (called in Update)
+      var direction = target.transform.position - object.transform.position;
+      var to = Quaternion.LookRotation(direction, Vector3.up);
+      object.transform.rotation = Quaternion.RotateTowards(
+          object.tranform.rotation, to, Time.deltaTime * speed);
+
+* Move an object forward smoothly:
+
+      // In Update
+      object.transform.Translate(0, 0, Time.deltaTime * speed);
 
 * Set the velocity of an object in the direction of another:
 
       object.velocity = anotherObject.forward * speed
+
+* Coroutine to rotate 90 degrees ("open") in a specific time:
+
+      IEnumerator Open()
+      {
+          var timeElapsed = 0f;
+          var startRotation = transform.rotation;
+          var endRotation = transform.rotation * Quaternion.Euler(0, 90, 0);
+
+          while (timeElapsed < duration)
+          {
+              transform.rotation = Quaternion.Slerp(
+                  startRotation, endRotation, timeElapsed / duration);
+              timeElapsed += Time.deltaTime;
+              yield return null;
+          }
+
+          transform.rotation = endRotation;    // really needed?
+      }
 
 ## Debugging
 
