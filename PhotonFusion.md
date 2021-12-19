@@ -5,6 +5,9 @@
 - Add a new "Spawner" script to it
 - Have the Spawner implement INetworkRunnerCallbacks,
   and have the methods do nothing (for now)
+  - Instead of implementing the Spawner through code,
+    you can add a "NetworkEvents" component to the NetworkRunner object
+    and hook up the callbacks via the Editor
 - At some point, NetworkRunner.StartGame must be called
   - Can prompt user to choose game mode (e.g., hosting or joining a game),
     and calling StartGame after this choice since StartGame needs game mode
