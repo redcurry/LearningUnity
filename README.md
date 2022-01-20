@@ -1613,6 +1613,22 @@
     * The Standard Assets package has some tree prefabs
     * Can add more trees if desired
 
+## Game Mechanics
+
+### Keys and Doors
+
+* Create key GameObject with a Collider and IsTrigger set to true
+* Add new script Key with a key type (e.g., Red) as a component
+* Create door GameObject with a Collider and IsTrigger set to true
+* Add new script KeyDoor with a key type to specify which key can open it
+  * Add OpenDoor() method that opens the door
+* Make sure the Player has a collider and Rigidbody to detect collisions
+* Add new script KeyHolder to the Player
+  * Add methods like AddKey and RemoveKey
+  * Add OnTriggerEnter method
+    * If collided with key, add it to list
+    * If collided with a door (KeyDoor component), call KeyDoor.OpenDoor()
+
 ## Code
 
 ### General
