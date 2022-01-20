@@ -1024,10 +1024,12 @@
     * Action-based: indirect access, takes advantage of the XR Input System
   * Browse to Assets -> Samples -> XR Interaction Toolkit ->
     1.0.0-pre8 -> Default Input Actions
-  * Drag each XRI Default controller preset to the corresponding XR Controller
+  * Remove the "XR Controller" components from each Controller, and
+    drag each XRI Default controller preset to the corresponding XR Controller
   * Create an empty object and call it "Input Action Manager"
   * Add the Input Action Manager component to it
-  * Set the Action Assets to the XRI Default Input Actions
+  * Add an item to the Action Assets, and set the item to the
+    XRI Default Input Actions (in the Default Input Actions folder)
 
 * Stationary vs room-scale XR Rig:
   * Stationary: the Tracking Origin Mode is set to Device
