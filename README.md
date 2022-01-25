@@ -1637,6 +1637,8 @@
 
 * ``Time.time`` is the number of seconds since the game started.
 
+* ``Application.targetFrameRate`` gets and sets the game's frame rate.
+
 * Call a method after ``x`` seconds:
 
       Invoke("MethodName", x);
