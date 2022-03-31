@@ -1613,6 +1613,13 @@
     * The Standard Assets package has some tree prefabs
     * Can add more trees if desired
 
+* Terrain design tips (from "Unity Environment Design" Udemy course)
+  * Use brush stamps to quickly create a rugged terrain
+  * Use bridge or set height tool to carve out paths in the terrain
+  * To add water, open Standard Assets > Environment > Water,
+    and drag WaterProDaytime prefab to the terrain (you may change
+    its shape by changing its mesh in the Inspector)
+
 ## Game Mechanics
 
 ### Keys and Doors
@@ -1867,7 +1874,7 @@
           private float updateInterval = 0.5f;
           private int framesCount;
           private float flamesTime;
-          private Text text;
+          private Text text;  // or TMPro.TextMeshPro
 
           void Start()
           {
