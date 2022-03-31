@@ -1874,7 +1874,7 @@
           private float updateInterval = 0.5f;
           private int framesCount;
           private float flamesTime;
-          private Text text;  // or TMPro.TextMeshPro
+          private Text text;  // or TMPro.TextMeshProUGUI
 
           void Start()
           {
